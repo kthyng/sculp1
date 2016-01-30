@@ -15,29 +15,30 @@ import glob
 from tracpy.tracpy_class import Tracpy
 
 
-grid_filename = '/atch/raid1/zhangxq/Projects/txla_nesting6/txla_grd_v4_new.nc'
-vert_filename='/atch/raid1/zhangxq/Projects/txla_nesting6/ocean_his_0001.nc'
-# currents_filename = list(np.sort(glob.glob('/atch/raid1/zhangxq/Projects/txla_nesting6/ocean_his_????.nc')))
+# grid_filename = '/atch/raid1/zhangxq/Projects/txla_nesting6/txla_grd_v4_new.nc'
+# vert_filename='/atch/raid1/zhangxq/Projects/txla_nesting6/ocean_his_0001.nc'
+# # currents_filename = list(np.sort(glob.glob('/atch/raid1/zhangxq/Projects/txla_nesting6/ocean_his_????.nc')))
 
-# grid_filename = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
-# can't aggregate years between 2012 and before with 2013 and 2014 bc they have different variables
-# years = np.arange(2011,2013)
-# currents_filename = []
-# for year in years:
-#     currents_filename.extend(np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_????.nc')))
+grid_filename = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
+currents_filename = grid_filename
+# # can't aggregate years between 2012 and before with 2013 and 2014 bc they have different variables
+# # years = np.arange(2011,2013)
+# # currents_filename = []
+# # for year in years:
+# #     currents_filename.extend(np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_????.nc')))
 
-# years = np.arange(2013,2015)
+# # years = np.arange(2013,2015)
+# # currents_filename = []
+# # for year in years:
+# #     currents_filename.extend(np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_*.nc')))
+
+# years = np.arange(2003,2015)
 # currents_filename = []
 # for year in years:
 #     currents_filename.extend(np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_*.nc')))
 
-years = np.arange(2003,2015)
-currents_filename = []
-for year in years:
-    currents_filename.extend(np.sort(glob.glob('/home/kthyng/shelf/' + str(year) + '/ocean_his_*.nc')))
-
-# grid = tracpy.inout.readgrid(grid_filename, usebasemap=True)
-grid = tracpy.inout.readgrid(grid_filename, vert_filename=vert_filename, usebasemap=True)
+grid = tracpy.inout.readgrid(grid_filename, usebasemap=True)
+# grid = tracpy.inout.readgrid(grid_filename, vert_filename=vert_filename, usebasemap=True)
 
 
 def init(name):
@@ -80,9 +81,12 @@ def init(name):
     dostream = 0
 
     # Initialize Tracpy class
-    tp = Tracpy(currents_filename, grid_filename=grid_filename, name=name, tseas=tseas, ndays=ndays, nsteps=nsteps, dostream=dostream, savell=False, doperiodic=0, 
+    tp = Tracpy(currents_filename, name=name, tseas=tseas, ndays=ndays, nsteps=nsteps, dostream=dostream, savell=False, doperiodic=0, 
                 N=N, ff=ff, ah=ah, av=av, doturb=doturb, do3d=do3d, z0=z0, zpar=zpar, 
-                time_units=time_units, usebasemap=True, grid=grid, vert_filename=vert_filename)
+                time_units=time_units, usebasemap=True, grid=grid)
+    # tp = Tracpy(currents_filename, grid_filename=grid_filename, name=name, tseas=tseas, ndays=ndays, nsteps=nsteps, dostream=dostream, savell=False, doperiodic=0, 
+    #             N=N, ff=ff, ah=ah, av=av, doturb=doturb, do3d=do3d, z0=z0, zpar=zpar, 
+    #             time_units=time_units, usebasemap=True, grid=grid, vert_filename=vert_filename)
 
     # tp._readgrid()
 
@@ -116,7 +120,7 @@ def init(name):
 
 def run():
 
-    year = 2013
+    year = 2012
 
     # Weekly Oct, Nov, Dec; biweekly Jan, Feb, Mar; monthly Apr, May, Jun, Jul
     startdates = np.array([datetime(year, 10, 1, 0, 1), datetime(year, 10, 8, 0, 1),
@@ -139,7 +143,7 @@ def run():
         
     # loop through state dates
     for startdate in startdates:
-
+        print startdate
         date = startdate
 
         name = date.isoformat()[0:13]
