@@ -42,20 +42,14 @@ def plot():
     fig = plt.figure(figsize=(14,8))
     ax = fig.add_subplot(111)
     ax.set_xlabel('Days'); ax.set_ylabel('Relative Dispersion [km$^2\!$]');
-    ax.text(0.58, 0.175, 'Data/Theory', color='r', transform=ax.transAxes)
-    ax.text(0.58, 0.125, 'Different years', color='0.5', transform=ax.transAxes)
+    ax.text(0.58, 0.165, 'Data', color='r', transform=ax.transAxes)
+    ax.text(0.58, 0.12, 'Different years', color='0.5', transform=ax.transAxes)
     ax.text(0.58, 0.075, 'Mean of different years', color='0.3', transform=ax.transAxes)
-    # ax.text(0.58, 0.025, 'Random displacement (-), A$_H= 5 m^2s^{-1}$', color='.2', transform=ax.transAxes)
-    # text(0.025, 0.02, 'Data/Theory', color='r', transform=ax.transAxes)
-    # text(0.025, 0.94, 'No diffusion (:)', color='.5', transform=ax.transAxes)
-    # text(0.25, 0.93, 'Turbulent fluctuations (-.), A$_H= 20 m^2/s$', color='.4', transform=ax.transAxes)
-    # text(0.25, 0.01, 'Random displacement (-), A$_H= 5 m^2/s$', color='.2', transform=ax.transAxes)
     ax.semilogy(np.array([7,7]), np.array([10**(-1), 10**(5)]), '-', color='lightgrey', linewidth=2)
-    ax2.plot(np.array([7,7]), np.array([1500000, 4000000]), '-', color='lightgrey', linewidth=2)
-    # Skip 2012 because of model output not matching variable set
-    years = np.array([2003,2004,2005,2006,2007,2008,2009,2010,2011,2013])
-    # runs = glob.glob('tracks/do*')
-    # for run in runs:
+    # ax2.plot(np.array([7,7]), np.array([1500000, 4000000]), '-', color='lightgrey', linewidth=2)
+    # # Skip 2012 because of model output not matching variable set
+    # years = np.array([2003,2004,2005,2006,2007,2008,2009,2010,2011,2013])
+    years = np.arange(2003, 2014)
     d = netCDF.Dataset('tracks/2003-10-01T00gc.nc')
     t = d.variables['tp']
     days = (t[0]-t[0,0])/(3600.*24) # time vector in days
@@ -68,21 +62,20 @@ def plot():
         D2mean += D2*nnans
         nnansmean += nnans
         ax.semilogy(days, D2, color='0.5', linewidth=4, alpha=0.5)#, symbols[doturb], color=colors[doturb], linewidth=4)
-        # if nnans.max()<3500000:
-        #     pdb.set_trace()
         ax2.plot(days,nnans, color='0.5', alpha=0.5, lw=4)
         
-    # pdb.set_trace()
     ax.semilogy(days, D2mean/nnansmean, color='0.3', linewidth=6)#, symbols[doturb], color=colors[doturb], linewidth=4)
-    # secs = t-t[0]
-    ax.semilogy(days[0:301], 7*np.exp(0.55*days[0:301]), 'r-', linewidth=5, alpha=1)#.5) # Exponential growth for first 10 days
-    ax.semilogy(days[302:], 10*days[302:]**2.2, 'r', linewidth=5, alpha=1)#.5)
-    ax.semilogy(lacasce[:,0], lacasce[:,1], 'ro', label='LaCasce', markersize=13, alpha=0.6)#, mew=1.5, mec='grey')
-    ax.semilogy(lacasce50[:,0], lacasce50[:,1], 'r*', label='LaCasce', markersize=15, alpha=0.6, markeredgewidth=1.5, mec='grey')
+    ax.semilogy(days[0:301], 7*np.exp(0.55*days[0:301]), 'r--', linewidth=5, alpha=0.5)#.5) # Exponential growth for first 10 days
+    ax.semilogy(days[320:], 11*days[320:]**2.2, 'r--', linewidth=5, alpha=0.5)#.5)
+    # ax.semilogy(days[302:], 10*days[302:]**2.2, 'r--', linewidth=5, alpha=0.7)#.5)
+    ax.semilogy(lacasce[:,0], lacasce[:,1], 'ro', label='LaCasce', markersize=13, alpha=0.9)#, mew=1.5, mec='grey')
+    # ax.semilogy(lacasce50[:,0], lacasce50[:,1], 'r*', label='LaCasce', markersize=15, alpha=0.6, markeredgewidth=1.5, mec='grey')
     # labels for analytic functions
-    ax.text(.3, 110, '$e^{0.55t}$', color='r', fontsize=30, fontweight='bold')
-    ax.text(37, 39000, '$t^{2.2}$', color='r', fontsize=30, fontweight='bold')
+    ax.text(0.7, 50, '$e^{0.55t}$', color='r', fontsize=25, fontweight='bold', alpha=0.7)
+    ax.text(20, 17000, '$t^{2.2}$', color='r', fontsize=25, fontweight='bold', alpha=0.7)
     ax.set_ylim(.5,10**5)
+    ax.set_xlim(0, 25)
+    ax2.plot(days, nnansmean, 'k')
     fig.savefig('figures/relative_dispersion_comp.pdf', bbox_inches='tight')
     fig2.savefig('figures/relative_dispersion_comp-nnans.pdf', bbox_inches='tight')
 
@@ -93,7 +86,7 @@ def run():
     '''
 
     # Skip 2012 because of model output not matching variable set
-    years = np.array([2003,2004,2005,2006,2007,2008,2009,2010,2011,2013])
+    years = np.array([2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013])
 
     # Location of TXLA model output
     # loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_nesting6.nc'
@@ -108,6 +101,7 @@ def run():
         Files.extend(glob.glob('tracks/' + str(year+1) + '-0[1-7]-*gc.nc'))
 
         D2nameyear = os.path.join('calcs', str(year) + 'D2.npz')
+        print D2nameyear
         if os.path.exists(D2nameyear): continue;
         D2 = []; nnans = [];
         for File in Files: # loop through all the runs of that type
@@ -122,7 +116,7 @@ def run():
                 xp, yp, _ = tracpy.tools.interpolate2d(xg, yg, grid, 'm_ij2ll')
                 d.close()
                 # D^2 is already averaged
-                D2_temp, nnans_temp, pairs = tracpy.calcs.rel_dispersion(xp, yp, r=1.05, squared=True)
+                D2_temp, nnans_temp, pairs = tracpy.calcs.rel_dispersion(xp, yp, r=[0, 1.05], squared=True)
                 np.savez(D2name, D2=D2_temp, nnans=nnans_temp) 
             else:
                 d = np.load(D2name)
